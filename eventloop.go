@@ -35,7 +35,7 @@ import (
 	gerrors "github.com/panjf2000/gnet/v2/pkg/errors"
 	"github.com/panjf2000/gnet/v2/pkg/logging"
 )
-
+// 核心结构体
 type eventloop struct {
 	ln           *listener       // listener
 	idx          int             // loop index in the engine loops list
@@ -85,11 +85,13 @@ func (el *eventloop) register(itf interface{}) error {
 		el.udpSockets[c.fd] = c
 		return nil
 	}
+	// 注册读事件
 	if err := el.poller.AddRead(c.pollAttachment); err != nil {
 		_ = unix.Close(c.fd)
 		c.releaseTCP()
 		return err
 	}
+	// 添加到连接管理中
 	el.connections[c.fd] = c
 	return el.open(c)
 }

@@ -327,6 +327,7 @@ var MaxStreamBufferCap = 64 * 1024 // 64KB
 //  unix  - Unix Domain Socket
 //
 // The "tcp" network scheme is assumed when one is not specified.
+// 启动
 func Run(eventHandler EventHandler, protoAddr string, opts ...Option) (err error) {
 	options := loadOptions(opts...)
 

@@ -34,7 +34,7 @@ import (
 	gerrors "github.com/panjf2000/gnet/v2/pkg/errors"
 	bsPool "github.com/panjf2000/gnet/v2/pkg/pool/byteslice"
 )
-
+// 核心结构体
 type conn struct {
 	ctx            interface{}             // user-defined context
 	peer           unix.Sockaddr           // remote socket address

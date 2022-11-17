@@ -28,7 +28,7 @@ import (
 	"github.com/panjf2000/gnet/v2/pkg/errors"
 	"github.com/panjf2000/gnet/v2/pkg/logging"
 )
-
+// 非阻塞
 func (eng *engine) accept(fd int, _ netpoll.IOEvent) error {
 	nfd, sa, err := unix.Accept(fd)
 	if err != nil {
@@ -51,6 +51,7 @@ func (eng *engine) accept(fd int, _ netpoll.IOEvent) error {
 	el := eng.lb.next(remoteAddr)
 	c := newTCPConn(nfd, el, sa, el.ln.addr, remoteAddr)
 
+	// 最后将conn交给subReactor管理
 	err = el.poller.UrgentTrigger(el.register, c)
 	if err != nil {
 		eng.opts.Logger.Errorf("UrgentTrigger() failed due to error: %v", err)

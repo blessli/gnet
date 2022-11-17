@@ -49,6 +49,7 @@ func OpenPoller() (poller *Poller, err error) {
 		err = os.NewSyscallError("epoll_create1", err)
 		return
 	}
+	// https://github.com/panjf2000/gnet/issues/72 轻量级的进程间通信的系统调用
 	if poller.efd, err = unix.Eventfd(0, unix.EFD_NONBLOCK|unix.EFD_CLOEXEC); err != nil {
 		_ = poller.Close()
 		poller = nil

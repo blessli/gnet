@@ -27,7 +27,7 @@ import (
 	"github.com/panjf2000/gnet/v2/internal/netpoll"
 	"github.com/panjf2000/gnet/v2/pkg/errors"
 )
-
+// 核心结构体
 type engine struct {
 	ln           *listener          // the listener for accepting new connections
 	lb           loadBalancer       // event-loops for handling events
@@ -133,8 +133,9 @@ func (eng *engine) activateEventLoops(numEventLoop int) (err error) {
 
 	return
 }
-
+// 核心方法
 func (eng *engine) activateReactors(numEventLoop int) error {
+	// 初始化numEventLoop数量的poller
 	for i := 0; i < numEventLoop; i++ {
 		if p, err := netpoll.OpenPoller(); err == nil {
 			el := new(eventloop)
@@ -152,7 +153,7 @@ func (eng *engine) activateReactors(numEventLoop int) error {
 
 	// Start sub reactors in background.
 	eng.startSubReactors()
-
+	// 初始化一个poller作为主线程，处理监听
 	if p, err := netpoll.OpenPoller(); err == nil {
 		el := new(eventloop)
 		el.ln = eng.ln
@@ -160,6 +161,7 @@ func (eng *engine) activateReactors(numEventLoop int) error {
 		el.engine = eng
 		el.poller = p
 		el.eventHandler = eng.eventHandler
+		// 注册读事件，接收客户端连接
 		if err = el.poller.AddRead(eng.ln.packPollAttachment(eng.accept)); err != nil {
 			return err
 		}
@@ -168,6 +170,7 @@ func (eng *engine) activateReactors(numEventLoop int) error {
 		// Start main reactor in background.
 		eng.wg.Add(1)
 		go func() {
+			// 主线程后台等待连接事件
 			el.activateMainReactor(eng.opts.LockOSThread)
 			eng.wg.Done()
 		}()
@@ -235,7 +238,7 @@ func (eng *engine) stop(s Engine) {
 }
 
 func serve(eventHandler EventHandler, listener *listener, options *Options, protoAddr string) error {
-	// Figure out the proper number of event-loops/goroutines to run.
+	// 找出要运行的事件循环/goroutines 的正确数量
 	numEventLoop := 1
 	if options.Multicore {
 		numEventLoop = runtime.NumCPU()
@@ -270,6 +273,7 @@ func serve(eventHandler EventHandler, listener *listener, options *Options, prot
 		return nil
 	}
 
+	// 调用start，开启所有的reactor
 	if err := eng.start(numEventLoop); err != nil {
 		eng.closeEventLoops()
 		eng.opts.Logger.Errorf("gnet engine is stopping with error: %v", err)

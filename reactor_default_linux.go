@@ -31,7 +31,7 @@ func (el *eventloop) activateMainReactor(lockOSThread bool) {
 	}
 
 	defer el.engine.signalShutdown()
-
+	// 调用epoll_wait阻塞，等待客户端连接
 	err := el.poller.Polling(func(fd int, ev uint32) error { return el.engine.accept(fd, ev) })
 	if err == errors.ErrEngineShutdown {
 		el.engine.opts.Logger.Debugf("main reactor is exiting in terms of the demand from user, %v", err)
@@ -51,6 +51,7 @@ func (el *eventloop) activateSubReactor(lockOSThread bool) {
 		el.engine.signalShutdown()
 	}()
 
+	// 内部会调用epoll_wait方法，阻塞在这个地方
 	err := el.poller.Polling(func(fd int, ev uint32) error {
 		if c, ack := el.connections[fd]; ack {
 			// Don't change the ordering of processing EPOLLOUT | EPOLLRDHUP / EPOLLIN unless you're 100%
