@@ -116,6 +116,7 @@ func (p *Poller) Trigger(fn queue.TaskFunc, arg interface{}) (err error) {
 }
 
 // Polling blocks the current goroutine, waiting for network-events.
+// 核心方法
 func (p *Poller) Polling(callback func(fd int, ev uint32) error) error {
 	el := newEventList(InitPollEventsCap)
 	var doChores bool
@@ -125,7 +126,7 @@ func (p *Poller) Polling(callback func(fd int, ev uint32) error) error {
 		n, err := unix.EpollWait(p.fd, el.events, msec)
 		if n == 0 || (n < 0 && err == unix.EINTR) {
 			msec = -1
-			runtime.Gosched()
+			runtime.Gosched()// 用于让出 CPU 时间片给其他 goroutine
 			continue
 		} else if err != nil {
 			logging.Errorf("error occurs in epoll: %v", os.NewSyscallError("epoll_wait", err))
@@ -135,7 +136,8 @@ func (p *Poller) Polling(callback func(fd int, ev uint32) error) error {
 
 		for i := 0; i < n; i++ {
 			ev := &el.events[i]
-			if fd := int(ev.Fd); fd != p.efd {
+			if fd := int(ev.Fd); fd != p.efd {// 一种是正常的fd发生网络连接事件
+				// 如果是正常的网络事件到来，就处理闭包函数，主线程处理的就是上面的accept连接函数
 				switch err = callback(fd, ev.Events); err {
 				case nil:
 				case errors.ErrAcceptSocket, errors.ErrEngineShutdown:
@@ -148,7 +150,7 @@ func (p *Poller) Polling(callback func(fd int, ev uint32) error) error {
 				_, _ = unix.Read(p.efd, p.efdBuf)
 			}
 		}
-
+		// 一种是通过NOTE_TRIGGER立即激活的事件
 		if doChores {
 			doChores = false
 			task := p.urgentAsyncTaskQueue.Dequeue()

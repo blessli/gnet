@@ -90,14 +90,14 @@ func TestServeWithGnetClient(t *testing.T) {
 	// the engine will echo back the data.
 	// waits for graceful connection closing.
 	t.Run("poll", func(t *testing.T) {
-		t.Run("tcp", func(t *testing.T) {
-			t.Run("1-loop", func(t *testing.T) {
-				testServeWithGnetClient(t, "tcp", ":9991", false, false, false, false, 10, RoundRobin)
-			})
-			// t.Run("N-loop", func(t *testing.T) {
-			// 	testServeWithGnetClient(t, "tcp", ":9992", false, false, true, false, 10, LeastConnections)
-			// })
-		})
+		// t.Run("tcp", func(t *testing.T) {
+		// 	t.Run("1-loop", func(t *testing.T) {
+		// 		testServeWithGnetClient(t, "tcp", ":9991", false, false, false, false, 10, RoundRobin)
+		// 	})
+		// 	// t.Run("N-loop", func(t *testing.T) {
+		// 	// 	testServeWithGnetClient(t, "tcp", ":9992", false, false, true, false, 10, LeastConnections)
+		// 	// })
+		// })
 		// t.Run("tcp-async", func(t *testing.T) {
 		// 	t.Run("1-loop", func(t *testing.T) {
 		// 		testServeWithGnetClient(t, "tcp", ":9991", false, false, false, true, 10, RoundRobin)
@@ -106,14 +106,14 @@ func TestServeWithGnetClient(t *testing.T) {
 		// 		testServeWithGnetClient(t, "tcp", ":9992", false, false, true, true, 10, LeastConnections)
 		// 	})
 		// })
-		// t.Run("udp", func(t *testing.T) {
-		// 	t.Run("1-loop", func(t *testing.T) {
-		// 		testServeWithGnetClient(t, "udp", ":9991", false, false, false, false, 10, RoundRobin)
-		// 	})
+		t.Run("udp", func(t *testing.T) {
+			t.Run("1-loop", func(t *testing.T) {
+				testServeWithGnetClient(t, "udp", ":9991", false, false, false, false, 10, RoundRobin)
+			})
 		// 	t.Run("N-loop", func(t *testing.T) {
 		// 		testServeWithGnetClient(t, "udp", ":9992", false, false, true, false, 10, LeastConnections)
 		// 	})
-		// })
+		})
 		// t.Run("udp-async", func(t *testing.T) {
 		// 	t.Run("1-loop", func(t *testing.T) {
 		// 		testServeWithGnetClient(t, "udp", ":9991", false, false, false, true, 10, RoundRobin)

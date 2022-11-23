@@ -35,14 +35,17 @@ import (
 	bsPool "github.com/panjf2000/gnet/v2/pkg/pool/byteslice"
 )
 // 核心结构体
+// conn相当于每个连接都会有自己独立的缓存空间。这样做是为了减少集中式管理内存带来的锁问题。使用Ring buffer是为了增加空间的复用性
 type conn struct {
 	ctx            interface{}             // user-defined context
 	peer           unix.Sockaddr           // remote socket address
 	localAddr      net.Addr                // local addr
 	remoteAddr     net.Addr                // remote addr
 	loop           *eventloop              // connected event-loop
+	// 存储还未发送给对端的数据
 	outboundBuffer *elastic.Buffer         // buffer for data that is eligible to be sent to the peer
 	pollAttachment *netpoll.PollAttachment // connection attachment for poller
+	// 存储对端发送的且未被用户读取的剩余数据
 	inboundBuffer  elastic.RingBuffer      // buffer for leftover data from the peer
 	buffer         []byte                  // buffer for the latest bytes
 	fd             int                     // file descriptor
@@ -103,7 +106,7 @@ func newUDPConn(fd int, el *eventloop, localAddr net.Addr, sa unix.Sockaddr, con
 	}
 	return
 }
-
+// 这是what
 func (c *conn) releaseUDP() {
 	c.ctx = nil
 	if addr, ok := c.localAddr.(*net.UDPAddr); ok && c.localAddr != c.loop.ln.addr {

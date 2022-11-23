@@ -1,6 +1,7 @@
 # env
 .idea/
-
+.sum
+samples/go.sum
 # dependencies
 /node_modules
 

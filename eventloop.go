@@ -302,7 +302,7 @@ func (el *eventloop) readUDP(fd int, _ netpoll.IOEvent) error {
 			fd, el.idx, os.NewSyscallError("recvfrom", err))
 	}
 	var c *conn
-	if fd == el.ln.fd {
+	if fd == el.ln.fd {// 这是what？
 		c = newUDPConn(fd, el, el.ln.addr, sa, false)
 	} else {
 		c = el.udpSockets[fd]
